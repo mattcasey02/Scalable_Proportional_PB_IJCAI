@@ -522,7 +522,7 @@ def exact_method_of_equal_shares_with_completion_approval_exhasutive(pabulib_fil
         'len_budget_increase_list': [len(budget_increase_list)],
         'max_budget_increase': [max(budget_increase_list)],
         'min_budget_increase': [min(budget_increase_list)],
-        'avg_budget_increase': [sum(budget_increase_list)/len(budget_increase_list)]
+        'avg_budget_increase': [sum(budget_increase_list)/len(budget_increase_list)],
         'monotonic_violation': [monotonic_violation]
     }
 
@@ -650,7 +650,7 @@ def exact_method_of_equal_shares_with_completion_approval_exhasutive_heuristic(p
         'len_budget_increase_list': [len(budget_increase_list)],
         'max_budget_increase': [max(budget_increase_list)],
         'min_budget_increase': [min(budget_increase_list)],
-        'avg_budget_increase': [sum(budget_increase_list)/len(budget_increase_list)]
+        'avg_budget_increase': [sum(budget_increase_list)/len(budget_increase_list)],
         'monotonic_violation': [monotonic_violation]
     }
 

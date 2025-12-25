@@ -57,7 +57,7 @@ def run_mes_with_exhaustion(pabulib_file: str, budget: int = 0) -> pd.DataFrame:
             non_mono_flag = 1
         print(f"Increase counter {increase_counter}")
         print(f"efficiency {efficiency}")
-        print(f"best efficiency {best efficiency}")
+        print(f"best efficiency {best_efficiency}")
         instance.budget_limit = instance.budget_limit+1
 
     #     # Calculate efficiency metrics
