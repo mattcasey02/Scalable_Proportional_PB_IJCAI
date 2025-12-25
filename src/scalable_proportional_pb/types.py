@@ -127,8 +127,12 @@ def leximax_lt(c1: Tuple[Fraction, Optional[str]], c2: Tuple[Fraction, Optional[
     """
     Compare two leximax payments: c1 <_lex c2.
     
-    (x, p) <_lex (x', p') iff x < x' or (x == x' and p <_C p')
-    where <_C is the tie-breaking order (lexicographic by project id).
+    (x, p) <_lex (x', p') iff x < x' or (x == x' and p >_C p')
+    where >_C is the tie-breaking order (lexicographic by project id).
+    
+    Note: In leximax preferences for stability, a "smaller" value is "better/preferred".
+    Since we tie-break by selecting larger IDs (Better), a larger ID must appear
+    "smaller" in the leximax order to be preferred.
     """
     x1, p1 = c1
     x2, p2 = c2
@@ -141,10 +145,14 @@ def leximax_lt(c1: Tuple[Fraction, Optional[str]], c2: Tuple[Fraction, Optional[
     if p1 is None and p2 is None:
         return False
     if p1 is None:
-        return True  # None < any project
+        return True  # None (no payment) is < any payment? 
+        # Wait, usually (0, None) is the smallest possible payment.
+        # But if amounts are equal, p1=None implies x1=0.
     if p2 is None:
         return False
-    return p1 < p2
+    
+    # Invert comparison: Better project (larger ID) is "smaller" in leximax order
+    return p1 > p2
 
 
 def leximax_gt(c1: Tuple[Fraction, Optional[str]], c2: Tuple[Fraction, Optional[str]]) -> bool:

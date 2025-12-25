@@ -74,47 +74,54 @@ def greedy_project_change_uniform(
         filtered.sort(key=lambda x: x[1])
         L_Op.append(filtered)
     
-    d: Optional[Fraction] = None  # None means infinity
-    ell = 0  # number of voters from O_p(X) contributing
-    i = w  # pointer into selection_order (1-indexed in paper, but we use 0-indexed)
-    
+    # Paper Algorithm 4 (uniform utilities), reconstructed from the PDF:
+    #
+    #   d := +∞
+    #   ℓ := 1
+    #   i := w+1
+    #   while ℓ ≤ |O_p(X)| do
+    #       i := min { i | (u(p)*(ℓ+|N_p(X)|)/cost(p), p) >_t (BpB(p_i), p_i) } ∪ {w+1}
+    #       d := min { d, cost(p)/(ℓ+|N_p(X)|) - L_i[|O_p(X)| - ℓ] }
+    #       ℓ := ℓ + 1
+    #   end
+    #   return d
+    #
+    # We implement it directly using:
+    # - `selection_order` = p1..pw in non-increasing (BpB, id) order
+    # - `i` as a 0-based list index into L_lists / L_Op, where paper i=w+1 is i=w
+    # - `L_i[|O|-ℓ]` as 0-based indexing (so ℓ=1 picks the last/richest element)
+
+    d: Optional[Fraction] = None  # None means +∞
+
     N_p_X_count = len(N_p_X)
-    
-    # Main loop: iterate through possible values of t (total contributors)
-    while i >= 0 and ell < len(O_p_X):
-        remaining_from_Op = len(O_p_X) - ell
-        t = N_p_X_count + remaining_from_Op
-        
-        if t == 0:
-            break
-            
-        PvP = cost / t  # per-voter price
+    O_size = len(O_p_X)
+
+    # paper i starts at w+1; our 0-based index is w
+    i = w
+
+    for ell in range(1, O_size + 1):
+        t = N_p_X_count + ell
+        PvP = cost / t
         current_bpb = bpb_for_t(t)
-        
-        # Decrease i while current_bpb is worse than project at position i-1
+
+        # Maintain i as non-increasing as ell increases (paper Lemma 5.5).
+        # Decrease i while (current_bpb, p) outranks (prev_bpb, prev_id).
         while i > 0:
             prev_id, prev_bpb = selection_order[i - 1]
-            if current_bpb < prev_bpb or (current_bpb == prev_bpb and project_id < prev_id):
+            if (current_bpb > prev_bpb) or (current_bpb == prev_bpb and project_id > prev_id):
                 i -= 1
             else:
                 break
-        
-        # Check if we can get a voter to contribute at this price
-        if i < len(L_Op) and ell < len(L_Op[i]):
-            v, L_val = L_Op[i][ell]
-            
-            if L_val >= PvP:
-                # This voter can afford it
-                pass
-            else:
-                # Need increase of PvP - L_val
-                required = PvP - L_val
-                if required > 0:
-                    if d is None or required < d:
-                        d = required
-        
-        ell += 1
-    
+
+        idx = O_size - ell  # ell-th richest element
+        if i >= len(L_Op) or idx < 0 or idx >= len(L_Op[i]):
+            continue
+
+        L_val = L_Op[i][idx][1]
+        required = PvP - L_val
+        if required > 0 and (d is None or required < d):
+            d = required
+
     return d
 
 

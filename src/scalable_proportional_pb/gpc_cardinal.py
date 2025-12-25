@@ -61,10 +61,26 @@ def greedy_project_change_cardinal(
     )
     
     # Build leximax payments list: sorted (voter, leximax_payment) for voters in O_p(X)
-    # leximax_payment = (max_payment, max_project_id)
+    # Sorted by leximax order (ascending).
+    # Since leximax_lt prefers Larger IDs (p1 > p2), we must sort such that
+    # Larger IDs come before Smaller IDs for equal amounts.
+    # Standard string sort is A < B. We want B < A.
+    class LeximaxKey:
+        def __init__(self, item):
+            self.amount = item[1][0]
+            self.pid = item[1][1]
+        
+        def __lt__(self, other):
+            if self.amount != other.amount:
+                return self.amount < other.amount
+            if self.pid is None: return True
+            if other.pid is None: return False
+            # Invert ID comparison: Larger ID is "smaller/better" in leximax
+            return self.pid > other.pid
+            
     leximax_list: List[Tuple[int, Tuple[Fraction, Optional[str]]]] = sorted(
         [(v, outcome.leximax_payment(v)) for v in O_p_X],
-        key=lambda x: (x[1][0], x[1][1] if x[1][1] else "")  # Sort by (amount, project_id)
+        key=LeximaxKey
     )
     
     # Initialize d to None (infinity)
