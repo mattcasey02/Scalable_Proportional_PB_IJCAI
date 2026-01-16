@@ -81,6 +81,9 @@ def mes_with_budget_increase_exhaustion(
     """
     initial_budget = int(instance.budget_limit)
     increase_counter = 0
+
+    highest_spend_so_far = 0
+    best_result_so_far = []
     
     while True:
         result = method_of_equal_shares(
@@ -93,6 +96,10 @@ def mes_with_budget_increase_exhaustion(
         
         if stop_on_overspend and total_cost > initial_budget:
             break
+
+        if total_cost <= initial_budget and total_cost > highest_spend_so_far:
+            highest_spend_so_far = total_cost
+            best_result_so_far = result
             
         if len(result) == len(instance):  # All projects selected
             break
@@ -100,8 +107,8 @@ def mes_with_budget_increase_exhaustion(
         increase_counter += 1
         instance.budget_limit = instance.budget_limit + 1
 
-    efficiency = total_cost / initial_budget if initial_budget > 0 else 0.0
-    return result, efficiency, increase_counter
+    efficiency = highest_spend_so_far / initial_budget if initial_budget > 0 else 0.0
+    return best_result_so_far, efficiency, increase_counter
 
 
 def create_mes_results_df(
