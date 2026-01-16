@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --account=p33118  ## Required: your Slurm account name, i.e. eXXXX, pXXXX or bXXXX
-#SBATCH --partition=medium ## Required: buyin, short, normal, long, gengpu, genhimem, etc.
+#SBATCH --partition=normal ## Required: buyin, short, normal, long, gengpu, genhimem, etc.
 #SBATCH --time=48:00:00       ## Required: How long will the job need to run?  Limits vary by partition
 #SBATCH --nodes=1             ## How many computers/nodes do you need? Usually 1
 #SBATCH --array=0-775     ## Parallelizing by creating a slurm job for each file. Use command (ls ../Data/*.pb | wc -l) to count how many files
