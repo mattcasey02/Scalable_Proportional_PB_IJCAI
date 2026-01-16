@@ -8,6 +8,7 @@ by different utility functions (cardinal/approval or cost/uniform).
 from typing import Callable, Dict, List, Tuple, Any
 from collections import OrderedDict
 from functools import partial
+import pandas as pd
 
 from .utils import (
     profile_preprocessing,
@@ -154,6 +155,79 @@ def exact_method_of_equal_shares_cost(
     return exact_method_of_equal_shares(
         instance, profile, utility_function=cost_utility, budget=budget
     )
+
+def exact_method_of_equal_shares_approval_add_one(
+    instance,
+    profile,
+    stop_on_overspend:bool = True,
+) -> Tuple[List, Dict, Dict, float, int]:
+    return exact_method_of_equal_shares_add_one(instance, profile, "cardinal", stop_on_overspend)
+
+def exact_method_of_equal_shares_cost_add_one(
+    instance,
+    profile,
+    stop_on_overspend:bool = True,
+) -> Tuple[List, Dict, Dict, float, int]:
+    return exact_method_of_equal_shares_add_one(instance, profile, "cost", stop_on_overspend)
+
+def exact_method_of_equal_shares_add_one(
+    instance,
+    profile,
+    utility_type,
+    stop_on_overspend:bool = True,
+) -> Tuple[List, Dict, Dict, float, int]:
+    
+    initial_budget = int(instance.budget_limit)
+    increase_counter = 0
+
+    highest_spend_so_far = 0
+    best_result_so_far = []
+
+    while True:
+        match utility_type:
+            case "cardinal":
+                funded_projects, payments, shares, total_cost = exact_method_of_equal_shares_approval(instance, profile)
+            case "cost":
+                funded_projects, payments, shares, total_cost = exact_method_of_equal_shares_cost(instance, profile)
+            case _:
+                raise ValueError("Please specify either cardinal or cost utilities")
+        
+        if stop_on_overspend and total_cost > initial_budget:
+            break
+
+        if total_cost <= initial_budget and total_cost > highest_spend_so_far:
+            highest_spend_so_far = total_cost
+            best_result_so_far = (funded_projects, payments, shares, total_cost)
+
+        if len(funded_projects) == len(instance):  # All projects selected
+            break
+
+        increase_counter += 1
+        instance.budget_limit = instance.budget_limit + 1
+
+    funded_projects, payments, shares, total_cost = best_result_so_far
+    return funded_projects, payments, shares, total_cost, increase_counter
+
+def create_ees_results_df(
+    result,
+    efficiency: float,
+    budget_increase_count: int,
+    max_increase: float = 0,
+    min_increase: float = 0,
+    avg_increase: float = 0,
+) -> pd.DataFrame:
+    """
+    Create a standardized results DataFrame for MES experiments.
+    """
+    data = {
+        'selected_projects': [result],
+        'efficiency': [efficiency],
+        'budget_increase_count': [budget_increase_count],
+        'max_budget_increase': [max_increase],
+        'min_budget_increase': [min_increase],
+        'avg_budget_increase': [avg_increase],
+    }
+    return pd.DataFrame(data)
 
 
 # Alias for backwards compatibility
