@@ -1,0 +1,14 @@
+#!/bin/bash
+
+sbatch submit_approval_equal_shares_addone_exhaustive.sh 
+sbatch submit_approval_equal_shares_addone_non_exhaustive.sh 
+sbatch submit_approval_equal_shares_no_completion.sh 
+sbatch submit_approval_waterflow_exhaustive.sh 
+sbatch submit_approval_waterflow_no_completion.sh 
+sbatch submit_approval_waterflow_non_exhaustive.sh 
+sbatch submit_cost_equal_shares_addone_exhaustive.sh 
+sbatch submit_cost_equal_shares_addone_non_exhaustive.sh 
+sbatch submit_cost_equal_shares_no_completion.sh 
+sbatch submit_cost_waterflow_exhaustive.sh 
+sbatch submit_cost_waterflow_no_completion.sh 
+sbatch submit_cost_waterflow_non_exhaustive.sh
