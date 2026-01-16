@@ -1,23 +1,9 @@
 #!/bin/bash
 
 # Working under the assumption that a virtualenvironment exists with
-# the proper python version
+# the proper python version and pabutools and pandas installed
 module load python/3.12.10
 source ../.venv/bin/activate
-
-# Check if pabutools is already installed
-if ! python3 -c "import pabutools" &> /dev/null; then
-    echo "PABUTools is not installed. Installing it now..."
-    # Install PABUTools using pip
-    pip install --user pabutools  # Use --user to install in user space on clusters
-fi
-
-# Check if pabutools is already installed
-if ! python3 -c "import pandas" &> /dev/null; then
-    echo "pandas is not installed. Installing it now..."
-    # Install PABUTools using pip
-    pip install --user pandas  # Use --user to install in user space on clusters
-fi
 
 
 # Folder containing files
